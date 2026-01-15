@@ -1,9 +1,8 @@
-from django.db import models
-
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
 from django.db import models
 from django.utils import timezone
 
+# --- User Manager ---
 class UserManager(BaseUserManager):
     def create_user(self, email, password=None, role='company', **extra_fields):
         """
@@ -19,7 +18,7 @@ class UserManager(BaseUserManager):
 
     def create_superuser(self, email, password=None, **extra_fields):
         """
-        Creates and saves a superuser (Admin).
+        Creates and saves a superuser (Admin)
         """
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
@@ -27,6 +26,7 @@ class UserManager(BaseUserManager):
         return self.create_user(email, password, role=role, **extra_fields)
 
 
+# --- User Model ---
 class User(AbstractBaseUser, PermissionsMixin):
     ROLE_CHOICES = (
         ('admin', 'Admin'),
@@ -47,4 +47,3 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return f"{self.email} ({self.role})"
-
