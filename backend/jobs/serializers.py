@@ -16,7 +16,7 @@ class AdminJobSerializer(serializers.ModelSerializer):
             'title',
             'company_email',
             'location',
-            'salary',
+            # 'salary',
             'status',
             'created_at'
         ]
@@ -79,48 +79,38 @@ class PublicJobSerializer(serializers.ModelSerializer):
             'skills',
             'created_at'
         ]
-# class CompanyJobCreateSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Job
-#         fields = [
-#             'id',
-#             'title',
-         
-#             'location',
-        
-#             'job_type',  # include if your Job model has job_type
-#             'skills',    # include if your Job model has ManyToManyField skills
-#             'status',    # read-only, admin verifies
-#             'created_at',
-#         ]
-#         read_only_fields = ['status', 'created_at', 'company']
-# class CompanyJobCreateSerializer(serializers.ModelSerializer):
-#     skills = serializers.SlugRelatedField(
-#         many=True,
-#         slug_field='name',
-#         queryset=Skill.objects.all()
-#     )
-
-#     class Meta:
-#         model = Job
-#         fields = ['title', 'location', 'job_type', 'skills']
-
-#     def create(self, validated_data):
-#         request = self.context.get('request')
-#         if request and hasattr(request, 'user'):
-#             validated_data['company'] = request.user  # Attach logged-in company
-#         return super().create(validated_data)
 class CompanyJobCreateSerializer(serializers.ModelSerializer):
-    skills = serializers.ListField(child=serializers.CharField(), required=False)
+    skills = serializers.ListField(
+        child=serializers.CharField(max_length=100),
+        required=False,
+        allow_empty=True
+    )
 
     class Meta:
         model = Job
         fields = ['title', 'job_type', 'location', 'skills']
 
+    def validate_title(self, value):
+        if not value or not value.strip():
+            raise serializers.ValidationError("Title cannot be empty.")
+        return value.strip()
+
+    def validate_location(self, value):
+        if not value or not value.strip():
+            raise serializers.ValidationError("Location cannot be empty.")
+        return value.strip()
+
     def create(self, validated_data):
         skills_data = validated_data.pop('skills', [])
+        request = self.context.get('request')
+        if request and hasattr(request, 'user'):
+            validated_data['company'] = request.user
+            validated_data['status'] = 'pending'
+        else:
+            raise serializers.ValidationError("User authentication required.")
+        
         job = Job.objects.create(**validated_data)
         for skill_name in skills_data:
-            skill, _ = Skill.objects.get_or_create(name=skill_name)
+            skill, _ = Skill.objects.get_or_create(name=skill_name.strip())
             job.skills.add(skill)
         return job

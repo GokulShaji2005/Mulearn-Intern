@@ -31,15 +31,7 @@ class AdminJobListView(generics.ListAPIView):
 
         return queryset
 
-class CompanyJobCreateView(generics.CreateAPIView):
-    serializer_class = JobSerializer
-    permission_classes = [IsAuthenticated, IsCompany]
 
-    def perform_create(self, serializer):
-        serializer.save(
-            company=self.request.user,
-            status='pending'
-        )
 
 class CompanyJobListView(generics.ListAPIView):
     serializer_class = JobSerializer

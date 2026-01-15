@@ -16,10 +16,27 @@ from decouple import config
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SPECTACULAR_SETTINGS = {
-    'TITLE': 'Job Listing API',
-    'DESCRIPTION': 'Backend Intern Assignment',
+    'TITLE': 'Job Portal API',
+    'DESCRIPTION': 'API documentation for Job Portal backend',
     'VERSION': '1.0.0',
+
+    'SERVE_INCLUDE_SCHEMA': False,
+
+    # JWT auth in Swagger
+    'SECURITY': [
+        {'bearerAuth': []},
+    ],
+    'COMPONENTS': {
+        'securitySchemes': {
+            'bearerAuth': {
+                'type': 'http',
+                'scheme': 'bearer',
+                'bearerFormat': 'JWT',
+            }
+        }
+    },
 }
+
 AUTH_USER_MODEL = 'accounts.User'
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
