@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
-
+from decouple import config
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -73,6 +73,17 @@ SPECTACULAR_SETTINGS = {
     'TITLE': 'Job Listing API',
     'DESCRIPTION': 'Backend Intern Assignment',
     'VERSION': '1.0.0',
+}
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'joblist',       # must be lowercase
+        'USER': 'app_user',      # your app-specific user
+        'PASSWORD': config('DB_PASSWORD'),
+        'HOST': 'localhost',
+        'PORT': '5432',
+    }
 }
 
 
